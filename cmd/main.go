@@ -1,26 +1,29 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"os"
-	"strconv"
 	"strings"
 
 	"ascii-art/internal"
 )
 
 func main() {
-	if len(os.Args) != 2 {
+	if len(os.Args) != 3 {
 		fmt.Println("Error: invalid usage")
-		fmt.Println("Usage: go run ./cmd \"your-text-here\"")
+		fmt.Println("Usage: go run ./cmd \"your-text-here\" \"banner-style-here\"")
 		os.Exit(1)
 	}
 
 	text := os.Args[1]
+	// ToLower so the user can pass any casing ("Shadow", "SHADOW", etc.).
+	filename := strings.ToLower(os.Args[2])
+	if filename != "shadow" && filename != "standard" && filename != "thinkertoy" {
+		fmt.Println("Error: invalid choice (must be \"Shadow\", \"Standard\" or \"Thinkertoy\")")
+		os.Exit(1)
+	}
 
-	// Only printable ASCII characters (32–126) are supported.
-	// Reject anything outside that range (e.g. accented letters, emoji).
+	// Banner files only define characters 32–126; reject anything outside that range.
 	for _, r := range text {
 		if r < 32 || r > 126 {
 			fmt.Printf("Error: invalid character %q (only printable ASCII is supported)\n", r)
@@ -28,36 +31,12 @@ func main() {
 		}
 	}
 
-	fmt.Println("In which style would you like that?")
-	fmt.Println("1 = Standard")
-	fmt.Println("2 = Shadow")
-	fmt.Println("3 = Thinkertoy")
-
-	reader := bufio.NewReader(os.Stdin)
-	input, err := reader.ReadString('\n')
-	if err != nil {
-		fmt.Printf("Error: failed to read input: %v\n", err)
-		os.Exit(1)
-	}
-	input = strings.TrimSpace(input)
-
-	choice, err := strconv.Atoi(input)
-	if err != nil || choice < 1 || choice > 3 {
-		fmt.Println("Error: invalid choice (must be 1, 2 or 3)")
-		os.Exit(1)
-	}
-
-	banners := []string{"banners/standard.txt", "banners/shadow.txt", "banners/thinkertoy.txt"}
-	filename := banners[choice-1]
-
-	// Split on the literal two-character sequence "\n" (backslash + n),
-	// which is how multi-line input is passed from the command line.
-	// e.g. "Hello\nThere" becomes ["Hello", "There"].
+	// The shell does not interpret \n inside double quotes, so callers pass the
+	// literal two-character sequence \n to represent a line break (e.g. "Hi\nThere").
 	lines := strings.Split(text, "\\n")
 
-	err = internal.PrintAscii(lines, filename)
-	if err != nil {
-		fmt.Printf("Error: %v\n", err)
+	if err := internal.PrintAscii(lines, "banners/"+filename+".txt"); err != nil {
+		fmt.Println("Error:", err)
 		os.Exit(1)
 	}
 }

@@ -5,16 +5,18 @@
 **Depends on:** none
 
 ## Acceptance criteria
-- [ ] `PrintAscii([]string{""}, ...)` behavior is explicitly decided and documented.
-- [ ] Related unit test matches the chosen behavior.
-- [ ] `go test ./...` passes.
+- [x] `PrintAscii([]string{""}, ...)` produces no output (empty string is skipped at index 0).
+- [x] Related unit test matches the chosen behavior.
+- [x] `go test ./...` passes.
 
-## Tests to write first
-- [ ] `TestEmptyLine`: proves empty input output is exactly as specified.
-- [ ] `TestNewlineSeparator`: proves `\n` separators still work after the change.
+## Tests written
+- [x] `TestEmptyLine`: confirms empty input produces no output.
+- [x] `TestNewlineSeparator`: confirms `\n` separators still work correctly.
 
 ## Notes
-- Empty input and `"\\n"` are different cases and should stay distinct.
+- Empty input and `"\\n"` are different cases and stay distinct.
+
+---
 
 # Task: CLI Input Validation
 
@@ -23,16 +25,15 @@
 **Depends on:** none
 
 ## Acceptance criteria
-- [ ] Missing argument shows usage guidance.
-- [ ] Invalid style input (non-number or out of range) exits with clear error.
-- [ ] Error paths return non-zero exit code.
-
-## Tests to write first
-- [ ] `TestMissingArgument`: proves app handles no argument correctly.
-- [ ] `TestInvalidStyleChoice`: proves style validation rejects bad values.
+- [x] Missing or extra arguments show usage guidance and exit non-zero.
+- [x] Invalid style input (not `standard`, `shadow`, or `thinkertoy`) exits with clear error.
+- [x] Error paths return non-zero exit code.
 
 ## Notes
-- Keep messages short and friendly for beginner users.
+- Style is passed as the second CLI argument (not an interactive prompt).
+- Style matching is case-insensitive via `strings.ToLower`.
+
+---
 
 # Task: Character Validation
 
@@ -41,16 +42,15 @@
 **Depends on:** none
 
 ## Acceptance criteria
-- [ ] Only ASCII `32-126` is accepted.
-- [ ] Accented letters and emoji are rejected with clear message.
-- [ ] Program exits with non-zero status on invalid characters.
-
-## Tests to write first
-- [ ] `TestRejectAccentedCharacter`: proves non-ASCII letters are blocked.
-- [ ] `TestRejectEmoji`: proves emoji input is blocked.
+- [x] Only ASCII `32–126` is accepted.
+- [x] Accented letters and emoji are rejected with a clear error message.
+- [x] Program exits with non-zero status on invalid characters.
 
 ## Notes
-- Validation should happen before rendering begins.
+- Validation happens in `main.go` before `PrintAscii` is called, so the renderer
+  can safely skip bounds checks on the banner index.
+
+---
 
 # Task: CI Checks
 
@@ -59,31 +59,27 @@
 **Depends on:** CLI Input Validation, Character Validation
 
 ## Acceptance criteria
-- [ ] CI runs `go test ./...`.
-- [ ] CI fails when tests fail.
-- [ ] CI checks formatting (for example `gofmt`).
-
-## Tests to write first
-- [ ] `CI: test job`: proves test command runs in pipeline.
-- [ ] `CI: fmt job`: proves formatting check runs in pipeline.
+- [x] CI runs `go test ./...`.
+- [x] CI fails when tests fail.
+- [x] CI checks formatting (`gofmt`).
 
 ## Notes
 - Keep CI simple and fast.
 
+---
+
 # Task: Documentation Refresh
 
-**Goal:** Make README clear for first-time readers and aligned with real behavior.
+**Goal:** Make README, PRD, and TASK_CARDS clear and aligned with real behavior.
 
 **Depends on:** Empty Input Behavior, CLI Input Validation
 
 ## Acceptance criteria
-- [ ] README has one quick start example.
-- [ ] README explains style selection and `\n` usage.
-- [ ] README input rules match actual code behavior.
-
-## Tests to write first
-- [ ] `Manual doc check: quick start`: proves command works as written.
-- [ ] `Manual doc check: multiline example`: proves example output flow is correct.
+- [x] README shows correct 2-argument command syntax.
+- [x] README explains style argument and `\n` usage.
+- [x] README input rules match actual code behavior.
+- [x] PRD CLI contract reflects 2-arg interface (no interactive prompt).
+- [x] PRD acceptance criteria and milestones marked complete where applicable.
 
 ## Notes
-- Keep wording simple enough for non-experts.
+- Interactive stdin style selection was removed; style is now a CLI argument.
